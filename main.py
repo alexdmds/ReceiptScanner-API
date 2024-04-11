@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from google.cloud import vision
 from AnalyseSpatiale import get_text_from_image
+from AnalyseText import get_structured_json_from_text
 
 app = Flask(__name__)
 
@@ -18,7 +19,9 @@ def process_ticket():
 
     texte = get_text_from_image(content)
 
-    return jsonify({'extracted_text': texte})
+    response_text = get_structured_json_from_text(texte)
+
+    return jsonify(response_text)
 
 if __name__ == '__main__':
     app.run(debug=True)

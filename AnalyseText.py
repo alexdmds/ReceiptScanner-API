@@ -95,7 +95,14 @@ def get_structured_json_from_text(text):
     data = {
         "model": "gpt-3.5-turbo",
         "messages": [
-            {"role": "user", "content": f"Analyse le texte brut suivant et détermine s'il s'agit d'un ticket de caisse. Retourne les informations dans un format JSON structuré comme indiqué ci-dessous. Si le texte est identifié comme un ticket de caisse, renvoie \"estTicket\": 1, sinon renvoie \"estTicket\": 0. Si certaines informations sont incertaines ou non disponibles, laisse les champs correspondants vides, mais assure-toi de toujours respecter la structure JSON suivante :\n\n{text}\n\nGénère uniquement la structure JSON demandée, sans commentaire supplémentaire. Assure-toi de conserver la structure, même si certaines informations ne peuvent pas être remplies."}
+            {
+                "role": "system",
+                "content": "Analyse le texte brut suivant et détermine s'il s'agit d'un ticket de caisse. Retourne les informations dans un format JSON structuré comme indiqué ci-dessous. Si le texte est identifié comme un ticket de caisse, renvoie \"estTicket\": 1, sinon renvoie \"estTicket\": 0. Si certaines informations sont incertaines ou non disponibles, laisse les champs correspondants vides, mais assure-toi de toujours respecter la structure JSON suivante :\n\n{\n  \"estTicket\": 0 ou 1,\n  \"nom_magasin\": \"Nom du Magasin ou champ vide si non disponible\",\n  \"adresse\": \"Adresse du Magasin ou champ vide si non disponible\",\n  \"telephone\": \"Numéro de Téléphone ou champ vide si non disponible\",\n  \"date_achat\": \"Date d'Achat ou champ vide si non disponible\",\n  \"heure_achat\": \"Heure d'Achat ou champ vide si non disponible\",\n  \"prix_total\": \"Montant total du ticket ou champ vide si non disponible\",\n  \"produits_achetes\": [\n    {\n      \"produit\": \"Nom du Produit 1 ou champ vide si non disponible\",\n      \"quantite\": Quantité du Produit 1 ou champ vide si non disponible,\n      \"prix_unitaire\": \"Prix du Produit 1 ou champ vide si non disponible\"\n    }\n    // Ajoute d'autres produits selon les données disponibles\n  ]\n}\n\nGénère uniquement la structure JSON demandée, sans commentaire supplémentaire. Assure-toi de conserver la structure, même si certaines informations ne peuvent pas être remplies."
+            },
+            {
+                "role": "user",
+                "content": text
+            }
         ],
         "temperature": 0.7,
         "max_tokens": 1024

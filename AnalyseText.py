@@ -1,10 +1,26 @@
 import requests
-import os
 import time
 import json
 
-# Remplacez ceci par votre propre clé API d'OpenAI
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+from google.cloud import secretmanager
+
+def access_openai_key():
+    # Initialiser le client Secret Manager
+    client = secretmanager.SecretManagerServiceClient()
+
+    # Spécifier le nom complet du secret (en remplaçant PROJECT_ID et SECRET_ID)
+    secret_name = "projects/441263626560/secrets/cle_OPEN_AI/versions/latest"
+
+    # Accéder à la dernière version du secret
+    response = client.access_secret_version(request={"name": secret_name})
+
+    # Le payload du secret est dans response.payload.data
+    openai_key = response.payload.data.decode("UTF-8")
+    
+    return openai_key
+
+# Exemple d'utilisation
+OPENAI_API_KEY = access_openai_key()
 
 text_test = """
 franprix FRANPRIX E 005408-11

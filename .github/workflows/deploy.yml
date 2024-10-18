@@ -22,6 +22,7 @@ jobs:
       with:
         project_id: c-troop-70f68  # Remplace par ton ID de projet GCP
         service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true  # Assure que l'authentification par défaut est utilisée
 
     - name: Deploy to App Engine
       run: gcloud app deploy --quiet

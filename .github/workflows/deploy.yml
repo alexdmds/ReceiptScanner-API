@@ -20,11 +20,8 @@ jobs:
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
       with:
-        project_id: c-troop-70f68 
+        project_id: c-troop-70f68  # Remplace par ton ID de projet GCP
         service_account_key: ${{ secrets.GCP_SA_KEY }}
-
-    - name: Authenticate Service Account
-      run: gcloud auth activate-service-account --key-file=${{ secrets.GCP_SA_KEY }}
 
     - name: Deploy to App Engine
       run: gcloud app deploy --quiet

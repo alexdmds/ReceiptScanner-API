@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
 from google.cloud import vision
-from AnalyseSpatiale import get_text_from_image
 from AnalyseText import get_structured_json_from_text
 
 app = Flask(__name__)

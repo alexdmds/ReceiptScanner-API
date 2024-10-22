@@ -1,56 +1,29 @@
-name: Deploy to Google App Engine
+        name: Deploy to Google App Engine
 
-on:
-  push:
-    branches:
-      - main  # Déclenche le déploiement effectif uniquement sur la branche main
-  pull_request:
-    branches:
-      - main  # Tester le déploiement lors des pull requests sur main (sans trafic réel)
-
-jobs:
-  test-deployment:
-    name: Test App Engine Deployment
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'  # Limite à l'événement Pull Request
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3  # Mise à jour vers la dernière version v3
-
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v1  # Utilisation de l'action d'authentification
-      with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
-      with:
-        project_id: c-troop-70f68  # Remplace par l'ID de ton projet GCP
-        install_components: app-engine-python
-
-    - name: Test deployment to App Engine
-      run: |
-        gcloud app deploy --no-promote --quiet  # Ne pas promouvoir cette version pour éviter le routage
-
-  deploy:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'  # Limite à un merge sur la branche main
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3  # Mise à jour vers la dernière version v3
-
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v1  # Utilisation de l'action d'authentification
-      with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
-      with:
-        project_id: c-troop-70f68  # Remplace par l'ID de ton projet GCP
-        install_components: app-engine-python
-
-    - name: Deploy to App Engine
-      run: |
-        gcloud app deploy --quiet  # Déploiement effectif avec routage du trafic
+        on:
+          push:
+            tags:
+              - 'v*'  # Déclenchement uniquement sur les tags de version
+        
+        jobs:
+          deploy:
+            name: Deploy to Production
+            runs-on: ubuntu-latest
+            steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+        
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v1
+              with:
+                credentials_json: ${{ secrets.GCP_SA_KEY }}
+        
+            - name: Set up Cloud SDK
+              uses: google-github-actions/setup-gcloud@v1
+              with:
+                project_id: c-troop-70f68
+                install_components: app-engine-python
+        
+            - name: Deploy to App Engine
+              run: |
+                gcloud app deploy --no-promote --quiet  # Déploiement effectif avec routage du trafic

@@ -1,0 +1,54 @@
+import json
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+from ticket_processor import process_ticket_image
+from PIL import Image, ExifTags
+
+# Chemin de l'image de test
+image_path = "tests/static/ticket_test_image.png"
+
+# Charger et lire le contenu de l'image
+with open(image_path, "rb") as image_file:
+    image_content = image_file.read()
+
+# Appeler la fonction de traitement pour obtenir le JSON
+response_text = process_ticket_image(image_content)
+
+# Préparer l'affichage de l'image et du JSON
+fig = plt.figure(figsize=(12, 6))
+gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
+
+# Charger l'image avec PIL et corriger l'orientation si nécessaire
+ax0 = plt.subplot(gs[0])
+image = Image.open(image_path)
+try:
+    for orientation in ExifTags.TAGS.keys():
+        if ExifTags.TAGS[orientation] == 'Orientation':
+            break
+    exif = image._getexif()
+    if exif is not None:
+        orientation_value = exif.get(orientation)
+        if orientation_value == 3:
+            image = image.rotate(180, expand=True)
+        elif orientation_value == 6:
+            image = image.rotate(270, expand=True)
+        elif orientation_value == 8:
+            image = image.rotate(90, expand=True)
+except (AttributeError, KeyError, IndexError):
+    # Pas de correction d'orientation si les métadonnées EXIF sont absentes
+    pass
+
+# Afficher l'image
+ax0.imshow(image)
+ax0.axis('off')
+ax0.set_title("Ticket Image")
+
+# Afficher le JSON formaté avec un fond blanc pour lisibilité
+ax1 = plt.subplot(gs[1])
+json_text = json.dumps(response_text, indent=2, ensure_ascii=False)
+ax1.text(0.05, 0.5, json_text, fontsize=10, va='center', ha='left', wrap=True)
+ax1.axis('off')
+ax1.set_title("JSON Output")
+
+plt.tight_layout()
+plt.show()

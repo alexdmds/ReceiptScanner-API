@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from ticket_processor import process_ticket_image
 from PIL import Image, ExifTags
+from destructure_expected_json import format_ticket_data
 
 # Chemin de l'image de test
 image_path = "tests/static/ticket_test_image.png"
@@ -13,6 +14,10 @@ with open(image_path, "rb") as image_file:
 
 # Appeler la fonction de traitement pour obtenir le JSON
 response_text = process_ticket_image(image_content)
+
+# Charger le JSON si `response_text` est une chaîne
+if isinstance(response_text, str):
+    response_text = json.loads(response_text)
 
 # Préparer l'affichage de l'image et du JSON
 fig = plt.figure(figsize=(12, 6))
@@ -43,10 +48,10 @@ ax0.imshow(image)
 ax0.axis('off')
 ax0.set_title("Ticket Image")
 
-# Afficher le JSON formaté avec un fond blanc pour lisibilité
+# Afficher le texte formaté avec `format_ticket_data`
 ax1 = plt.subplot(gs[1])
-json_text = json.dumps(response_text, indent=2, ensure_ascii=False)
-ax1.text(0.05, 0.5, json_text, fontsize=10, va='center', ha='left', wrap=True)
+formatted_text = format_ticket_data(response_text)  # Utilisation de la fonction formatée
+ax1.text(0.05, 0.5, formatted_text, fontsize=10, va='center', ha='left', wrap=True)
 ax1.axis('off')
 ax1.set_title("JSON Output")
 

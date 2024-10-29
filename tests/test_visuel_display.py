@@ -1,19 +1,19 @@
 import json
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from ticket_processor import process_ticket_image
+from analyse_ticket import analyse_ticket
 from PIL import Image, ExifTags
-from destructure_expected_json import format_ticket_data
+from utils.destructure_expected_json import format_ticket_data
 
 # Chemin de l'image de test
-image_path = "tests/static/ticket_test_image.png"
+image_path = "tests/static/erStvuAPnBpjXCQ7z0Ig_photo.jpg"
 
 # Charger et lire le contenu de l'image
 with open(image_path, "rb") as image_file:
     image_content = image_file.read()
 
 # Appeler la fonction de traitement pour obtenir le JSON
-response_text = process_ticket_image(image_content)
+response_text = analyse_ticket(image_content)
 
 # Charger le JSON si `response_text` est une chaîne
 if isinstance(response_text, str):

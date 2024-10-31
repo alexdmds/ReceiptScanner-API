@@ -1,7 +1,7 @@
 import pytest
 import requests
 from unittest.mock import patch
-from main import app
+from src.main import app
 
 # Simuler le client Flask pour les tests
 @pytest.fixture

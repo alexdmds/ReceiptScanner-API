@@ -1,5 +1,5 @@
 from google.cloud import vision
-from utils.OpenAICall import get_structured_json_from_text
+from API.OpenAICall import get_structured_json_from_text
 
 def analyse_image(image_content):
     # Initialisez le client Vision

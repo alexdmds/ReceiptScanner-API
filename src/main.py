@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
-from analyse_ticket import analyse_ticket
+from process_ticket.analyse_ticket import analyse_ticket
 
 app = Flask(__name__)
 

@@ -1,6 +1,8 @@
 from process_ticket.fonction_actuelle import analyse_image
 #Ce fichier va contenir la fonction principale appelée dans le main qui prend en entrée une image et qui retourne un json structuré
 #Il appelle d'autres utilitaires pour réaliser les fonctions unitaires
+from process_ticket.extract_text import get_text_from_image
+from API.OpenAICall import get_structured_json_from_text
 
 import logging
 import os
@@ -41,7 +43,15 @@ configure_logging()
 
 def analyse_ticket(image):
 
-    # Appeler la fonction d'analyse de l'image
-    json = analyse_image(image)
+    #on va appeler la fonction d'analyse de l'image qui va retourner le texte extrait de l'image
+    text = get_text_from_image(image)
 
-    return json
+    # Convertir le texte en JSON structuré
+    try:
+        response_json = get_structured_json_from_text(text)
+        logging.debug("Texte converti en JSON structuré.")
+    except Exception as e:
+        logging.error("Erreur lors de la conversion du texte en JSON structuré : %s", e)
+        raise
+
+    return response_json

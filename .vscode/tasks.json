@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run pytest without mock",
+            "type": "shell",
+            "command": "ENV=production pytest tests/test_visuel_display.py",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Run pytest on test_visuel_display without using mock"
+        }
+    ]
+}

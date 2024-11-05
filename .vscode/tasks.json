@@ -7,10 +7,21 @@
             "command": "ENV=production pytest tests/test_visuel_display.py",
             "group": {
                 "kind": "test",
-                "isDefault": true
+                "isDefault": false
             },
             "problemMatcher": [],
             "detail": "Run pytest on test_visuel_display without using mock"
+        },
+        {
+            "label": "Run pytest with mock",
+            "type": "shell",
+            "command": "ENV=local pytest tests/test_visuel_display.py",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Run pytest on test_visuel_display with mock"
         }
     ]
 }

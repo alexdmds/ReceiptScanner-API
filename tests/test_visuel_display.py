@@ -1,16 +1,17 @@
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 import json
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from src.process_ticket.analyse_ticket import analyse_ticket
+from process_ticket.analyse_ticket import analyse_ticket
 from PIL import Image, ExifTags
-from src.utils.destructure_expected_json import format_ticket_data
+from utils.destructure_expected_json import format_ticket_data
+
 
 # Chemin de l'image de test
-image_path = "tests/static/ticket_test_image.png"
+image_path = "tests/static/erreur_recente.jpg"
 
 # Charger et lire le contenu de l'image
 with open(image_path, "rb") as image_file:

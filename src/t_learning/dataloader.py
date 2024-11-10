@@ -1,50 +1,39 @@
 import json
-from google.cloud import storage
 from torch.utils.data import Dataset
 from PIL import Image
-from io import BytesIO
 import torch
+import os
 
 class TicketDataset(Dataset):
-    def __init__(self, bucket_name, annotation_folder, transform=None):
-        client = storage.Client()
-        self.bucket = client.get_bucket(bucket_name)
-        
-        # Liste des blobs d'annotation dans le dossier spécifié
-        self.annotation_blobs = list(self.bucket.list_blobs(prefix=annotation_folder))
-        print("Nombre de blobs d'annotation trouvés :", len(self.annotation_blobs))
+    def __init__(self, annotation_folder, image_folder, transform=None):
+        # Dossiers locaux
+        self.annotation_folder = annotation_folder
+        self.image_folder = image_folder
         self.transform = transform
 
+        # Charger la liste des fichiers d'annotations locaux
+        self.annotation_files = [
+            f for f in os.listdir(annotation_folder) if f.endswith(".json")
+        ]
+        print("Nombre de fichiers d'annotation trouvés :", len(self.annotation_files))
+
     def __len__(self):
-        return len(self.annotation_blobs)
+        return len(self.annotation_files)
 
     def __getitem__(self, idx):
-        # Récupérer le blob d'annotation
-        annotation_blob = self.annotation_blobs[idx]
-        print(f"Traitement du blob : {annotation_blob.name}")
+        # Chemin de l'annotation
+        annotation_path = os.path.join(self.annotation_folder, self.annotation_files[idx])
         
-        annotation_text = annotation_blob.download_as_text()
-        print(f"Contenu brut de {annotation_blob.name} : {annotation_text[:100]}...")
+        # Charger l'annotation JSON
+        with open(annotation_path, "r") as f:
+            annotation_data = json.load(f)
 
-        # Vérifier si le blob est vide
-        if not annotation_text.strip():
-            print(f"Le blob {annotation_blob.name} est vide, il sera ignoré.")
-            return None  # Ignorer cette annotation et l'image correspondante
+        # Chemin de l'image
+        image_name = os.path.basename(annotation_data['task']['data']['image'])
+        image_path = os.path.join(self.image_folder, image_name)
 
-        # Charger le contenu JSON
-        try:
-            annotation_data = json.loads(annotation_text)
-        except json.JSONDecodeError as e:
-            print(f"Erreur de décodage JSON pour le blob {annotation_blob.name}: {e}")
-            return None  # Ignorer cette annotation et l'image correspondante
-        
-        # Récupérer le chemin de l'image depuis l'annotation
-        image_path = annotation_data['task']['data']['image']
-        image_blob = self.bucket.blob(image_path.replace("gs://kadi_label_studio/", ""))
-        
-        # Télécharger et charger l'image
-        image_data = image_blob.download_as_bytes()
-        image = Image.open(BytesIO(image_data)).convert("RGB")
+        # Charger l'image
+        image = Image.open(image_path).convert("RGB")
         
         # Préparer les cibles (annotations) pour l'image
         targets = self.prepare_target(annotation_data, image.size)
@@ -71,7 +60,6 @@ class TicketDataset(Dataset):
                 targets["boxes"] = torch.cat((targets["boxes"], torch.tensor([[x_min, y_min, x_max, y_max]], dtype=torch.float32)), dim=0)
                 targets["labels"] = torch.cat((targets["labels"], torch.tensor([1], dtype=torch.int64)), dim=0)  # 1 pour "ticket"
 
-        # Retourner `targets` vide si aucune boîte n'a été trouvée
         return targets
 
 # Collate function pour ignorer les échantillons `None`

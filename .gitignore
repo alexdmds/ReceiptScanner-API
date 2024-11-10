@@ -1,2 +1,4 @@
 env/
 venv/
+local_images
+local_annotations

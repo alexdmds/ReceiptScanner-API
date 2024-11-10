@@ -5,9 +5,14 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 import torchvision.transforms as T
 
-# Initialiser le dataset et le DataLoader
-transform = T.Compose([T.ToTensor()])  # Ajouter d'autres transformations si nécessaire
-ticket_dataset = TicketDataset("kadi_label_studio", "annotations", transform=transform)
+# Utiliser les dossiers locaux pour les annotations et les images
+annotation_folder = "local_annotations"
+image_folder = "local_images"
+
+# Initialiser le dataset avec les données locales
+ticket_dataset = TicketDataset(annotation_folder, image_folder, transform=T.Compose([T.ToTensor()]))
+
+# Créer le DataLoader avec collate_fn pour gérer les échantillons `None`
 data_loader = DataLoader(ticket_dataset, batch_size=2, shuffle=True, collate_fn=collate_fn)
 
 # Initialiser le modèle et l'optimiseur
@@ -25,12 +30,9 @@ num_epochs = 5
 for epoch in range(num_epochs):
     model.train()
     for images, targets in data_loader:
-        print(f"Nombre d'images: {len(images)}, Nombre de cibles: {len(targets)}")
         images = list(image.to(device) for image in images)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets if isinstance(t, dict)]
         
-        # Vérifiez le contenu de `targets`
-        print(f"Targets: {targets}")
         loss_dict = model(images, targets)
         losses = sum(loss for loss in loss_dict.values())
         

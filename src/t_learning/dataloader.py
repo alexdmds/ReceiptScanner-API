@@ -36,29 +36,37 @@ class TicketDataset(Dataset):
         image = Image.open(image_path).convert("RGB")
         
         # Préparer les cibles (annotations) pour l'image
-        targets = self.prepare_target(annotation_data, image.size)
+        targets = self.prepare_target(annotation_data)
         
         if self.transform:
             image = self.transform(image)
         
         return image, targets
 
-    def prepare_target(self, annotation, image_size):
-        targets = {"boxes": torch.zeros((0, 4), dtype=torch.float32), "labels": torch.zeros((0,), dtype=torch.int64)}
+    def prepare_target(self, annotation):
+        # On laisse les boîtes en pourcentages
+        targets = {"boxes": [], "labels": []}
         
         for result in annotation.get("result", []):
             if result['type'] == 'rectanglelabels':
                 box = result['value']
-                x_min = box['x'] / 100 * image_size[0]
-                y_min = box['y'] / 100 * image_size[1]
-                width = box['width'] / 100 * image_size[0]
-                height = box['height'] / 100 * image_size[1]
-                x_max = x_min + width
-                y_max = y_min + height
+                x_min = box['x']
+                y_min = box['y']
+                x_max = x_min + box['width']
+                y_max = y_min + box['height']
 
-                # Ajouter la boîte englobante et le label à `targets`
-                targets["boxes"] = torch.cat((targets["boxes"], torch.tensor([[x_min, y_min, x_max, y_max]], dtype=torch.float32)), dim=0)
-                targets["labels"] = torch.cat((targets["labels"], torch.tensor([1], dtype=torch.int64)), dim=0)  # 1 pour "ticket"
+                # Ajouter la boîte englobante et le label en pourcentages
+                targets["boxes"].append([x_min, y_min, x_max, y_max])
+                targets["labels"].append(1)  # 1 pour "ticket"
+
+        # Si aucune boîte n'est présente, on retourne des tenseurs vides pour "boxes" et "labels"
+        if len(targets["boxes"]) == 0:
+            targets["boxes"] = torch.zeros((0, 4), dtype=torch.float32)
+            targets["labels"] = torch.zeros((0,), dtype=torch.int64)
+        else:
+            # Sinon, on convertit en tenseurs
+            targets["boxes"] = torch.tensor(targets["boxes"], dtype=torch.float32)
+            targets["labels"] = torch.tensor(targets["labels"], dtype=torch.int64)
 
         return targets
 

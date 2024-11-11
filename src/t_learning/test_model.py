@@ -16,7 +16,7 @@ model.load_state_dict(torch.load(model_checkpoint_path, map_location=torch.devic
 model.eval()
 
 # Charger l'image de test
-image_path = "local_images/ae5581b4-3f06-41c9-8803-ec2f6ba70c457259346815411422506.jpg"  # Remplacez par le chemin de votre image
+image_path = "tests/static/p0BRZDxUjvJVIfS7RNjz_photo.jpg"  # Remplacez par le chemin de votre image
 original_image = Image.open(image_path).convert("RGB")
 
 # Appliquer la rotation si nécessaire
@@ -52,7 +52,7 @@ resized_image = Image.fromarray(resized_image.astype('uint8'))
 draw = ImageDraw.Draw(resized_image)
 for box in filtered_boxes:
     x_min, y_min, x_max, y_max = box
-    draw.rectangle([x_min, y_min, x_max, y_max], outline="green", width=3)
+    draw.rectangle([x_min*4, y_min*4, x_max*4, y_max*4], outline="green", width=3)
 
 # Afficher l'image avec les prédictions
 plt.imshow(resized_image)

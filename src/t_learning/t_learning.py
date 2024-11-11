@@ -30,7 +30,7 @@ train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
 # Créer les DataLoaders pour l'entraînement et la validation
 train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, collate_fn=collate_fn)
-val_loader = DataLoader(val_dataset, batch_size=2, shuffle=False, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, collate_fn=collate_fn)
 print("Nombre de mini-batchs pour l'entraînement :", len(train_loader))
 # Initialiser le modèle et l'optimiseur
 model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=torchvision.models.detection.FasterRCNN_ResNet50_FPN_Weights.COCO_V1)
@@ -41,7 +41,7 @@ model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCN
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 print("Utilisation de l'appareil :", device)
 model.to(device)
-optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=0.0005)
+optimizer = optim.SGD(model.parameters(), lr=0.002, momentum=0.9, weight_decay=0.001)
 
 
 # Charger le checkpoint
@@ -55,7 +55,7 @@ loss = checkpoint['loss']  # Optionnel
 model.train()
 
 # Entraînement et validation
-num_epochs = 2
+num_epochs = 15
 print("début de l'entraînement")
 for epoch in range(num_epochs):
     start_time = time.time()  # Enregistrer le temps de début
@@ -77,6 +77,31 @@ for epoch in range(num_epochs):
     avg_train_loss = running_loss / len(train_loader)
     epoch_duration = time.time() - start_time  # Calculer le temps écoulé pour l'époque
     print(f"Epoch {epoch+1}, Train Loss: {avg_train_loss}, Duration: {epoch_duration:.2f} seconds")
+
+    # Validation
+    start_time = time.time()  # Enregistrer le temps de début
+    model.eval()
+    val_loss = 0.0
+    with torch.no_grad():  # Désactiver le calcul des gradients pour économiser de la mémoire
+        for images, targets in val_loader:
+            images = list(image.to(device) for image in images)
+            targets = [{k: v.to(device) for k, v in t.items() if k != 'image_name'} for t in targets if isinstance(t, dict)]
+            
+            # Passer temporairement en mode train pour calculer la perte
+            model.train()
+            loss_dict = model(images, targets)
+            model.eval()  # Repasser en mode eval immédiatement après
+
+            # Assurez-vous que loss_dict est bien un dictionnaire
+            if isinstance(loss_dict, dict):
+                losses = sum(loss for loss in loss_dict.values())
+                val_loss += losses.item()
+            else:
+                print("Loss non calculé en mode évaluation pour ces données.")
+    
+    val_duration = time.time() - start_time  # Calculer le temps écoulé pour la validation
+    avg_val_loss = val_loss / len(val_loader) if len(val_loader) > 0 else float('nan')
+    print(f"Epoch {epoch+1}, Validation Loss: {avg_val_loss}", f"Duration: {val_duration:.2f} seconds")
 
     torch.save({
     'epoch': epoch,

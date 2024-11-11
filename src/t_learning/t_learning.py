@@ -29,7 +29,7 @@ val_size = len(dataset) - train_size
 train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
 # Créer les DataLoaders pour l'entraînement et la validation
-train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, collate_fn=collate_fn)
 val_loader = DataLoader(val_dataset, batch_size=2, shuffle=False, collate_fn=collate_fn)
 print("Nombre de mini-batchs pour l'entraînement :", len(train_loader))
 # Initialiser le modèle et l'optimiseur
@@ -55,7 +55,7 @@ loss = checkpoint['loss']  # Optionnel
 model.train()
 
 # Entraînement et validation
-num_epochs = 5
+num_epochs = 2
 print("début de l'entraînement")
 for epoch in range(num_epochs):
     start_time = time.time()  # Enregistrer le temps de début
@@ -67,7 +67,7 @@ for epoch in range(num_epochs):
         
         loss_dict = model(images, targets)
         losses = sum(loss for loss in loss_dict.values())
-        print(losses)
+        #print(losses)
         running_loss += losses.item()
         
         optimizer.zero_grad()

@@ -7,6 +7,15 @@ import torchvision.transforms as T
 import time
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
+import csv
+
+# Ouvrir ou créer un fichier CSV pour enregistrer les pertes
+loss_file_path = "train_val_loss.csv"
+
+# Écrire les en-têtes du fichier
+with open(loss_file_path, mode='w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(["Epoch", "Train Loss", "Validation Loss"])
 
 # Utiliser les dossiers locaux pour les annotations et les images
 annotation_folder = "local_annotations"
@@ -34,8 +43,8 @@ val_size = len(dataset) - train_size
 train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
 # Créer les DataLoaders pour l'entraînement et la validation
-train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, collate_fn=collate_fn)
-val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False, collate_fn=collate_fn)
 print("Nombre de mini-batchs pour l'entraînement :", len(train_loader))
 
 
@@ -53,7 +62,7 @@ model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCN
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 print("Utilisation de l'appareil :", device)
 model.to(device)
-optimizer = optim.SGD(model.parameters(), lr=0.002, momentum=0.9, weight_decay=0.001)
+optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=0.001)
 
 '''
 # Charger le checkpoint
@@ -67,7 +76,7 @@ loss = checkpoint['loss']  # Optionnel
 model.train()
 
 # Entraînement et validation
-num_epochs = 15
+num_epochs = 20
 print("début de l'entraînement")
 for epoch in range(num_epochs):
     start_time = time.time()  # Enregistrer le temps de début
@@ -114,6 +123,11 @@ for epoch in range(num_epochs):
     val_duration = time.time() - start_time  # Calculer le temps écoulé pour la validation
     avg_val_loss = val_loss / len(val_loader) if len(val_loader) > 0 else float('nan')
     print(f"Epoch {epoch+1}, Validation Loss: {avg_val_loss}", f"Duration: {val_duration:.2f} seconds")
+
+    # Enregistrer les pertes dans le fichier CSV
+    with open(loss_file_path, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([epoch + 1, avg_train_loss, avg_val_loss])
 
     torch.save({
     'epoch': epoch,

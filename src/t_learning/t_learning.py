@@ -27,9 +27,10 @@ def collate_fn(batch):
     return tuple(zip(*batch))
 
 transform = A.Compose([
-    A.HorizontalFlip(p=0.5),
     A.RandomBrightnessContrast(p=0.2),
-    A.Resize(400, 400),  # Pour s'assurer que toutes les images sont redimensionnées
+    A.ElasticTransform(alpha=1, sigma=50, p=0.5),
+    A.RandomFog(fog_coef_lower=0.3, fog_coef_upper=0.8, p=1.0),
+    A.GaussNoise(noise_scale_factor=0.5, p=1.0),
     ToTensorV2()
 ], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['labels']))
 

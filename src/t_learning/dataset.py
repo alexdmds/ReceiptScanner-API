@@ -6,6 +6,31 @@ import os
 import numpy as np
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
+import cv2
+from PIL import Image, ExifTags
+
+def read_image_correct_orientation(image_path):
+    # Ouvrir l'image avec PIL
+    image = Image.open(image_path)
+    
+    # Correction de l'orientation selon les métadonnées EXIF
+    try:
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation':
+                break
+        exif = image._getexif()
+        if exif is not None and orientation in exif:
+            if exif[orientation] == 3:
+                image = image.rotate(180, expand=True)
+            elif exif[orientation] == 6:
+                image = image.rotate(270, expand=True)
+            elif exif[orientation] == 8:
+                image = image.rotate(90, expand=True)
+    except (AttributeError, KeyError, IndexError):
+        # Pas d'information EXIF pour l'orientation, continuer sans correction
+        pass
+
+    return np.array(image)
 
 class TicketDataset(Dataset):
     def __init__(self, annotation_folder, image_folder, transform=None):
@@ -34,37 +59,40 @@ class TicketDataset(Dataset):
 
         # Chemin de l'image
         image_name = os.path.basename(annotation_data['task']['data']['image'])
+
         image_path = os.path.join(self.image_folder, image_name)
 
         # Charger l'image
-        image = Image.open(image_path).convert("RGB")
-
-        self.image_size = image.size  # Récupère la taille sous la forme (largeur, hauteur)
-
+        image = read_image_correct_orientation(image_path)
 
         # Convertir l'image en numpy array pour Albumentations
         image = np.array(image)
 
+        #redimensionner l'image en 400x400
+        image = cv2.resize(image, (400, 400))
+
         # Préparer les boîtes et labels pour Albumentations
-        bboxes, labels = self.get_bboxes_and_labels(annotation_data)
+        bboxes_norm, labels = self.get_bboxes_and_labels(annotation_data)
+
 
         # Appliquer les transformations si définies
         if self.transform:
-            transformed = self.transform(image=image, bboxes=bboxes, labels=labels)
+            transformed = self.transform(image=image, bboxes=bboxes_norm, labels=labels)
             image = transformed['image']
             bboxes = transformed['bboxes']
             labels = transformed['labels']
-        
-        # Dénormaliser les boîtes pour les ramener aux valeurs en pixels
-        bboxes = [
-            [
-                int(box[0] * self.image_size[0]), 
-                int(box[1] * self.image_size[1]), 
-                int(box[2] * self.image_size[0]), 
-                int(box[3] * self.image_size[1])
-            ]
-            for box in bboxes
-        ]
+
+
+        # Convertir les boîtes englobantes en format [x_min, y_min, x_max, y_max]
+        bboxes = []
+        for box in bboxes_norm:
+            x_min, y_min, x_max, y_max = box
+            x_min = int(x_min * 400)
+            y_min = int(y_min * 400)
+            x_max = int(x_max * 400)
+            y_max = int(y_max * 400)
+            bboxes.append([x_min, y_min, x_max, y_max])
+
         # Vérifier si bboxes est vide et créer les tenseurs correspondants
         if not bboxes:
             targets = {
@@ -78,6 +106,8 @@ class TicketDataset(Dataset):
             }
         
         image = image.float() / 255.0  # Convertir en float et normaliser entre 0 et 1
+
+
         return image, targets
 
     def get_bboxes_and_labels(self, annotation):

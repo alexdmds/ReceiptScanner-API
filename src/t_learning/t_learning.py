@@ -1,10 +1,12 @@
 import torch
-from dataloader import TicketDataset, collate_fn
+from dataset import TicketDataset
 import torchvision
 from torch.utils.data import DataLoader, random_split
 import torch.optim as optim
 import torchvision.transforms as T
 import time
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 
 # Utiliser les dossiers locaux pour les annotations et les images
 annotation_folder = "local_annotations"
@@ -12,12 +14,15 @@ image_folder = "local_images"
 model_checkpoint_path = "src/t_learning/model_checkpoint.pth"  # Chemin pour sauvegarder le modèle
 model_path = "src/t_learning/model.pth"  # Chemin pour sauvegarder le modèle final
 
-# Transformation avec redimensionnement
-transform = T.Compose([
-    T.Resize((400, 400)),  # Redimensionner les images à 800x800
-    T.ToTensor()
-])
+def collate_fn(batch):
+    return tuple(zip(*batch))
 
+transform = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.RandomBrightnessContrast(p=0.2),
+    A.Resize(400, 400),  # Pour s'assurer que toutes les images sont redimensionnées
+    ToTensorV2()
+], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['labels']))
 
 # Initialiser le dataset avec les données locales
 dataset = TicketDataset(annotation_folder, image_folder, transform=transform)
@@ -32,25 +37,32 @@ train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, collate_fn=collate_fn)
 val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, collate_fn=collate_fn)
 print("Nombre de mini-batchs pour l'entraînement :", len(train_loader))
-# Initialiser le modèle et l'optimiseur
-model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=torchvision.models.detection.FasterRCNN_ResNet50_FPN_Weights.COCO_V1)
-num_classes = 2
+
+
+# Importer le modèle avec les poids pré-entraînés
+model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_320_fpn(
+    weights=torchvision.models.detection.FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.COCO_V1
+)
+
+# Adapter le nombre de classes (background + "ticket")
+num_classes = 2  # par exemple, 1 pour "ticket" + 1 pour "background"
 in_features = model.roi_heads.box_predictor.cls_score.in_features
 model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(in_features, num_classes)
+
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 print("Utilisation de l'appareil :", device)
 model.to(device)
 optimizer = optim.SGD(model.parameters(), lr=0.002, momentum=0.9, weight_decay=0.001)
 
-
+'''
 # Charger le checkpoint
 checkpoint = torch.load(model_checkpoint_path)
 model.load_state_dict(checkpoint['model_state_dict'])
 optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 start_epoch = checkpoint['epoch'] + 1  # Reprendre à l'époque suivante
 loss = checkpoint['loss']  # Optionnel
-
+'''
 # Mettre le modèle en mode entraînement
 model.train()
 
@@ -67,7 +79,7 @@ for epoch in range(num_epochs):
         
         loss_dict = model(images, targets)
         losses = sum(loss for loss in loss_dict.values())
-        #print(losses)
+        print(losses)
         running_loss += losses.item()
         
         optimizer.zero_grad()

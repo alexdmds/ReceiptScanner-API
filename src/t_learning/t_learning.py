@@ -3,11 +3,9 @@ from dataset import TicketDataset
 import torchvision
 from torch.utils.data import DataLoader, random_split
 import torch.optim as optim
-import torchvision.transforms as T
 import time
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
 import csv
+from custom_transform import CustomTransform
 
 # Ouvrir ou créer un fichier CSV pour enregistrer les pertes
 loss_file_path = "train_val_loss.csv"
@@ -26,16 +24,9 @@ model_path = "src/t_learning/model.pth"  # Chemin pour sauvegarder le modèle fi
 def collate_fn(batch):
     return tuple(zip(*batch))
 
-transform = A.Compose([
-    A.RandomBrightnessContrast(p=0.2),
-    A.ElasticTransform(alpha=1, sigma=50, p=0.5),
-    A.RandomFog(fog_coef_lower=0.3, fog_coef_upper=0.8, p=1.0),
-    A.GaussNoise(noise_scale_factor=0.5, p=1.0),
-    ToTensorV2()
-], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['labels']))
 
 # Initialiser le dataset avec les données locales
-dataset = TicketDataset(annotation_folder, image_folder, transform=transform)
+dataset = TicketDataset(annotation_folder, image_folder, transform=CustomTransform())
 print("Nombre total d'images dans le dataset :", len(dataset))
 
 # Diviser le dataset en ensembles d'entraînement et de validation
@@ -63,7 +54,7 @@ model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCN
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 print("Utilisation de l'appareil :", device)
 model.to(device)
-optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9, weight_decay=0.001)
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.001)
 
 '''
 # Charger le checkpoint
@@ -77,7 +68,7 @@ loss = checkpoint['loss']  # Optionnel
 model.train()
 
 # Entraînement et validation
-num_epochs = 20
+num_epochs = 400
 print("début de l'entraînement")
 for epoch in range(num_epochs):
     start_time = time.time()  # Enregistrer le temps de début
@@ -138,6 +129,8 @@ for epoch in range(num_epochs):
 }, model_checkpoint_path)
     print(f"Modèle sauvegardé après l'époque {epoch+1} à {model_checkpoint_path}")
 
-
-torch.save(model.state_dict(), model_path)
-print("Modèle sauvegardé à", model_path)
+    
+    if epoch % 10 == 0:
+        torch.save(model.state_dict(), model_path)
+        print("Modèle sauvegardé à", model_path)
+        

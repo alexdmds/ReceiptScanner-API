@@ -74,14 +74,10 @@ class TicketDataset(Dataset):
         # Préparer les boîtes et labels pour Albumentations
         bboxes_norm, labels = self.get_bboxes_and_labels(annotation_data)
 
-
         # Appliquer les transformations si définies
         if self.transform:
-            transformed = self.transform(image=image, bboxes=bboxes_norm, labels=labels)
-            image = transformed['image']
-            bboxes = transformed['bboxes']
-            labels = transformed['labels']
-
+            transformed = self.transform(image=image, bboxes=bboxes_norm)
+            image, bboxes_norm = transformed
 
         # Convertir les boîtes englobantes en format [x_min, y_min, x_max, y_max]
         bboxes = []
@@ -105,9 +101,6 @@ class TicketDataset(Dataset):
                 "labels": torch.tensor(labels, dtype=torch.int64)
             }
         
-        image = image.float() / 255.0  # Convertir en float et normaliser entre 0 et 1
-
-
         return image, targets
 
     def get_bboxes_and_labels(self, annotation):

@@ -6,8 +6,8 @@ import torch
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from dataset import TicketDataset
-from PIL import Image
-from torchvision.transforms import ToPILImage
+from custom_transform import CustomTransform
+
 
 annotation_folder = "local_annotations"
 image_folder = "local_images"
@@ -45,16 +45,8 @@ def visualize_sample(image, bboxes, labels=None):
 def collate_fn(batch):
     return tuple(zip(*batch))
 
-transform = A.Compose([
-    A.RandomBrightnessContrast(p=0.2),
-    A.ElasticTransform(alpha=1, sigma=50, p=0.5),
-    A.RandomFog(fog_coef_lower=0.3, fog_coef_upper=0.8, p=1.0),
-    A.GaussNoise(noise_scale_factor=0.5, p=1.0),
-    ToTensorV2()
-], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['labels']))
-
 # Initialiser le dataset avec les données locales
-dataset = TicketDataset(annotation_folder, image_folder, transform=transform)
+dataset = TicketDataset(annotation_folder, image_folder, transform=CustomTransform())
 # Charger un échantillon aléatoire pour vérifier les transformations et les annotations
 sample_loader = DataLoader(dataset, batch_size=1, shuffle=True, collate_fn=collate_fn)
 for i, (images, targets) in enumerate(sample_loader):

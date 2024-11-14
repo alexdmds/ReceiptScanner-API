@@ -6,7 +6,9 @@ import torchvision
 
 # Charger le modèle sauvegardé
 model_checkpoint_path = "src/t_learning/model.pth"
-model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None)
+model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_320_fpn(
+    weights=None  # Ne pas charger les poids pré-entraînés
+)
 num_classes = 2  # Modifier selon votre modèle
 in_features = model.roi_heads.box_predictor.cls_score.in_features
 model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(in_features, num_classes)
@@ -16,7 +18,7 @@ model.load_state_dict(torch.load(model_checkpoint_path, map_location=torch.devic
 model.eval()
 
 # Charger l'image de test
-image_path = "tests/static/p0BRZDxUjvJVIfS7RNjz_photo.jpg"  # Remplacez par le chemin de votre image
+image_path = "tests/static/462562326_1394586214848752_426626803125374696_n.jpg"  # Remplacez par le chemin de votre image
 original_image = Image.open(image_path).convert("RGB")
 
 # Appliquer la rotation si nécessaire
@@ -52,7 +54,7 @@ resized_image = Image.fromarray(resized_image.astype('uint8'))
 draw = ImageDraw.Draw(resized_image)
 for box in filtered_boxes:
     x_min, y_min, x_max, y_max = box
-    draw.rectangle([x_min*4, y_min*4, x_max*4, y_max*4], outline="green", width=3)
+    draw.rectangle([x_min, y_min, x_max, y_max], outline="green", width=3)
 
 # Afficher l'image avec les prédictions
 plt.imshow(resized_image)

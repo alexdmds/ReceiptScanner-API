@@ -18,7 +18,7 @@ model.load_state_dict(torch.load(model_checkpoint_path, map_location=torch.devic
 model.eval()
 
 # Charger l'image de test
-image_path = "tests/static/462562326_1394586214848752_426626803125374696_n.jpg"  # Remplacez par le chemin de votre image
+image_path = "tests/static/462542886_926539116209447_6025966826638074524_n.jpg"  # Remplacez par le chemin de votre image
 original_image = Image.open(image_path).convert("RGB")
 
 # Appliquer la rotation si nécessaire

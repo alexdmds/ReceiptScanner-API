@@ -142,8 +142,8 @@ for epoch in range(num_epochs):
     if avg_val_loss < best_val_loss:
         best_val_loss = avg_val_loss
         epochs_no_improve = 0
-        torch.save(model.state_dict(), model_checkpoint_path)
-        print(f"Modèle amélioré, sauvegardé à l'époque {epoch+1}")
+        torch.save(model.state_dict(), model_path)
+        print("Modèle sauvegardé à", model_path)
     else:
         epochs_no_improve += 1
 
@@ -156,9 +156,3 @@ for epoch in range(num_epochs):
     # Scheduler
     scheduler.step(avg_val_loss)
     print(f"Taux d'apprentissage actuel : {optimizer.param_groups[0]['lr']}")
-
-    
-    if epoch % 10 == 0:
-        torch.save(model.state_dict(), model_path)
-        print("Modèle sauvegardé à", model_path)
-        

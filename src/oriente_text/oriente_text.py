@@ -70,12 +70,6 @@ def straighten_using_ocr(image):
 
     annotations = text_data
 
-    # Dessiner les boîtes englobantes sur l'image
-    draw = ImageDraw.Draw(image)
-    for annotation in annotations:
-        vertices = annotation['bounding_poly']
-        draw.polygon(vertices, outline="red", width=2)
-
     # Calculer l'angle moyen des boîtes englobantes
     angle = 0
     nb_angles = 0
@@ -95,7 +89,10 @@ def straighten_using_ocr(image):
     angle = np.degrees(angle)
     print(f"Angle moyen détecté : {angle:.2f}°")
 
+    # Détecter le mode de l'image et ajuster la couleur de remplissage
+    fillcolor = 255 if image.mode == "L" else (255, 255, 255)
+
     # Appliquer la rotation pour redresser l'image
-    rotated_image = image.rotate(-angle, expand=True, fillcolor=(255, 255, 255))
+    rotated_image = image.rotate(-angle, expand=True, fillcolor=fillcolor)
 
     return rotated_image

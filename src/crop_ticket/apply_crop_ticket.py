@@ -3,7 +3,7 @@ from PIL import Image
 import torchvision.transforms as T
 import torchvision
 
-def crop_highest_confidence_box(image_path):
+def crop_highest_confidence_box(image):
     """
     Applique le modèle sur une image, sélectionne la boîte la plus probable et
     retourne la zone recadrée au format d'origine si le score dépasse un seuil.
@@ -32,7 +32,7 @@ def crop_highest_confidence_box(image_path):
     # Parcourir toutes les images dans le dossier
     confidence_threshold = 0.5  # Seuil de confiance pour afficher les prédictions
     # Charger l'image d'origine
-    original_image = Image.open(image_path).convert("RGB")
+    original_image = image
     original_width, original_height = original_image.size
 
     # Transformation de l'image pour le modèle

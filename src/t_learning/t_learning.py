@@ -6,6 +6,7 @@ import torch.optim as optim
 import time
 import csv
 from custom_transform import CustomTransform
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 # Ouvrir ou créer un fichier CSV pour enregistrer les pertes
 loss_file_path = "train_val_loss.csv"
@@ -54,7 +55,15 @@ model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCN
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 print("Utilisation de l'appareil :", device)
 model.to(device)
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.001)
+optimizer = optim.SGD(model.parameters(), lr=0.015, momentum=0.9, weight_decay=0.001)
+
+# Scheduler de réduction du taux d'apprentissage si la perte de validation stagne
+scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.1, verbose=True)
+
+# Paramètres pour l'arrêt anticipé
+early_stop_patience = 15
+best_val_loss = float("inf")
+epochs_no_improve = 0
 
 '''
 # Charger le checkpoint
@@ -128,6 +137,25 @@ for epoch in range(num_epochs):
     'loss': avg_train_loss,
 }, model_checkpoint_path)
     print(f"Modèle sauvegardé après l'époque {epoch+1} à {model_checkpoint_path}")
+
+    # Enregistrer si la perte de validation s'améliore
+    if avg_val_loss < best_val_loss:
+        best_val_loss = avg_val_loss
+        epochs_no_improve = 0
+        torch.save(model.state_dict(), model_checkpoint_path)
+        print(f"Modèle amélioré, sauvegardé à l'époque {epoch+1}")
+    else:
+        epochs_no_improve += 1
+
+    # Arrêt anticipé
+    if epochs_no_improve >= early_stop_patience:
+        print("Arrêt anticipé activé")
+        break
+
+
+    # Scheduler
+    scheduler.step(avg_val_loss)
+    print(f"Taux d'apprentissage actuel : {optimizer.param_groups[0]['lr']}")
 
     
     if epoch % 10 == 0:

@@ -15,15 +15,15 @@ class CustomTransform:
         image = cv2.convertScaleAbs(image, alpha=contrast, beta=brightness * 50 - 50)
         return image
 
-    def random_crop(self, image, bboxes):
+    def random_crop(self, image, bboxes, crop_pourcentage=0.1):
         # définit un random crop entre 0 et 10% de la taille d'origine sur tous les bords
         #remet l'image à sa dimension d'origine
         h0, w0 = image.shape[:2]
 
-        x_start = np.random.randint(0, int(w0 * 0.1))
-        x_end = np.random.randint(int(w0 * 0.9), w0)
-        y_start = np.random.randint(0, int(h0 * 0.1))
-        y_end = np.random.randint(int(h0 * 0.9), h0)
+        x_start = np.random.randint(0, int(w0 * crop_pourcentage))
+        x_end = np.random.randint(int(w0 * (1-crop_pourcentage)), w0)
+        y_start = np.random.randint(0, int(h0 * crop_pourcentage))
+        y_end = np.random.randint(int(h0 * (1- crop_pourcentage)), h0)
 
         image = image[y_start:y_end, x_start:x_end]
         h1, w1 = image.shape[:2]
@@ -153,10 +153,10 @@ class CustomTransform:
         image = self.apply_color_jitter(image)
 
         # Appliquer zoom out avec réflexion
-        image, bboxes = self.zoom_out_with_reflection(image, bboxes)
+        image, bboxes = self.zoom_out_with_reflection(image, bboxes, scale=0.95)
 
         # Appliquer translation aléatoire
-        image, bboxes = self.random_translation(image, bboxes)
+        image, bboxes = self.random_translation(image, bboxes, max_translation=0.05)
 
         # Appliquer rotation aléatoire
         image, bboxes = self.random_rotation(image, bboxes)
@@ -168,6 +168,6 @@ class CustomTransform:
         image = self.apply_sharpness(image)
 
         # Appliquer recadrage aléatoire
-        image, bboxes = self.random_crop(image, bboxes)
+        image, bboxes = self.random_crop(image, bboxes, crop_pourcentage=0.05)
 
         return torch.tensor(image, dtype=torch.float32).permute(2, 0, 1) / 255.0, bboxes

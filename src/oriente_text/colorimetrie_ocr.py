@@ -65,7 +65,7 @@ def preprocess_image_for_ocr(image):
 
 if __name__ == "__main__":
     # Charger l'image d'exemple
-    image_path = "tests/static/erreur_recente2.jpg"
+    image_path = "tests/static/erreur_recente.jpg"
     image = Image.open(image_path)
 
     image = crop_highest_confidence_box(image)

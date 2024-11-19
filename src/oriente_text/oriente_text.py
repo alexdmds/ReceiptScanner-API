@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageOps
 import io
 from PIL.ExifTags import TAGS as ExifTags
+from sklearn.cluster import DBSCAN
 
 def straighten_using_ocr(image):
     """
@@ -70,29 +71,41 @@ def straighten_using_ocr(image):
 
     annotations = text_data
 
-    # Calculer l'angle moyen des boîtes englobantes
-    angle = 0
-    nb_angles = 0
+    # Repérer tous les angles de rotation
+    angle = []
     for annotation in annotations:
         vertices = annotation['bounding_poly']
         pt1, pt2, pt3, pt4 = [pt for pt in vertices]
         for A, B in [(pt1, pt2), (pt4, pt3)]:
             if A[0] > B[0]:
-                angle += np.pi + np.arctan((A[1] - B[1]) / (A[0] - B[0]))
-                nb_angles += 1
+                angle.append(np.pi + np.arctan((A[1] - B[1]) / (A[0] - B[0])))
             if A[0] < B[0]:
-                angle += np.arctan((A[1] - B[1]) / (A[0] - B[0]))
-                nb_angles += 1
-                
+                angle.append(np.arctan((A[1] - B[1]) / (A[0] - B[0])))
+    
 
-    angle /= -(nb_angles or 1)
-    angle = np.degrees(angle)
-    print(f"Angle moyen détecté : {angle:.2f}°")
+    #appliquer DBSCAN sur les angles pour détecter le cluster principal
+
+    angle = np.array(angle).reshape(-1, 1)
+    dbscan = DBSCAN(eps=0.1, min_samples=1)
+    dbscan.fit(angle)
+    cluster_id = np.argmax(np.bincount(dbscan.labels_))
+    angle = np.mean(angle[dbscan.labels_ == cluster_id]) * 180 / np.pi
+
+
+    print(f"Angle moyen du cluster pirncipal détecté : {angle:.2f}°")
 
     # Détecter le mode de l'image et ajuster la couleur de remplissage
     fillcolor = 255 if image.mode == "L" else (255, 255, 255)
 
     # Appliquer la rotation pour redresser l'image
-    rotated_image = image.rotate(-angle, expand=True, fillcolor=fillcolor)
+    rotated_image = image.rotate(angle, expand=True, fillcolor=fillcolor)
 
     return rotated_image
+
+if __name__ == '__main__':
+    # Charger une image de ticket
+    image_path = 'tests/static/erreur_recente.jpg'
+
+    image = Image.open(image_path)
+    rotated_image = straighten_using_ocr(image)
+    rotated_image.show()

@@ -3,4 +3,3 @@ venv/
 local_images
 local_annotations
 *.pth
-!src/crop_ticket/model_v1.pth

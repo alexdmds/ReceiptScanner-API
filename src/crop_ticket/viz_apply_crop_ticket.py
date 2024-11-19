@@ -7,7 +7,7 @@ import torchvision
 from apply_crop_ticket import crop_highest_confidence_box
 
 # Dossier contenant les images à tester
-image_folder = "local_images"
+image_folder = "tests/static"
 
 for image_name in os.listdir(image_folder):
     image_path = os.path.join(image_folder, image_name)
@@ -15,9 +15,11 @@ for image_name in os.listdir(image_folder):
         continue  # Ignorer les fichiers non image
 
     print(f"Traitement de l'image : {image_name}")
-
+    
+    # Charger l'image
+    image = Image.open(image_path)
     # Recadrer l'image avec la boîte de plus haute confiance
-    cropped_image = crop_highest_confidence_box(image_path)
+    cropped_image = crop_highest_confidence_box(image)
 
     if cropped_image is not None:
         # Afficher l'image recadrée

@@ -1,11 +1,22 @@
-from process_ticket.fonction_actuelle import analyse_image
+import sys
+import os
+
+# Ajouter dynamiquement le dossier parent à sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, "../../"))  # Chemin vers le dossier parent contenant src
+sys.path.append(project_root)
+
 #Ce fichier va contenir la fonction principale appelée dans le main qui prend en entrée une image et qui retourne un json structuré
 #Il appelle d'autres utilitaires pour réaliser les fonctions unitaires
-from process_ticket.extract_text import get_text_from_image
 from API.OpenAICall import get_structured_json_from_text
+from src.crop_ticket.apply_crop_ticket import crop_highest_confidence_box
+from src.oriente_text.oriente_text import straighten_using_ocr
+from src.oriente_text.colorimetrie_ocr import preprocess_image_for_ocr
+from src.organize_text.organize_text import ocr_ticket_with_clustering_and_columns
 
 import logging
-import os
+from PIL import Image
+import io
 
 def configure_logging():
     # Récupérer l'environnement (local ou production) depuis une variable d'environnement
@@ -41,17 +52,69 @@ def configure_logging():
 configure_logging()
 
 
-def analyse_ticket(image):
+def analyse_ticket(image_content):
+    """
+    Analyse une image de ticket et retourne un JSON structuré.
 
-    #on va appeler la fonction d'analyse de l'image qui va retourner le texte extrait de l'image
-    text = get_text_from_image(image)
+    Args:
+        image_content (bytes): Contenu binaire de l'image du ticket.
 
-    # Convertir le texte en JSON structuré
+    Returns:
+        dict: JSON structuré contenant les informations extraites du ticket.
+    """
+    logger = logging.getLogger("analyse_ticket")
+
     try:
-        response_json = get_structured_json_from_text(text)
-        logging.debug("Texte converti en JSON structuré.")
-    except Exception as e:
-        logging.error("Erreur lors de la conversion du texte en JSON structuré : %s", e)
-        raise
+        logger.info("Début de l'analyse du ticket.")
 
-    return response_json
+        # Convertir le contenu binaire en image PIL
+        try:
+            image = Image.open(io.BytesIO(image_content))
+            logger.debug("Image chargée avec succès.")
+        except Exception as e:
+            logger.error("Erreur lors du chargement de l'image : %s", e)
+            raise
+
+        # Étape 1 : Appliquer les prétraitements
+        logger.debug("Début du prétraitement de l'image.")
+        image = crop_highest_confidence_box(image)
+        logger.debug("Étape 1 : Image recadrée avec succès.")
+        
+        image = straighten_using_ocr(image)
+        logger.debug("Étape 2 : Image redressée avec succès.")
+        
+        image = preprocess_image_for_ocr(image)
+        logger.debug("Étape 3 : Image prétraitée pour l'OCR avec succès.")
+
+        # Étape 2 : Appliquer l'OCR avec clustering
+        logger.info("Début de l'OCR et du clustering.")
+        try:
+            lignes = ocr_ticket_with_clustering_and_columns(image)
+            logger.debug(f"OCR terminé. {len(lignes)} lignes détectées.")
+        except Exception as e:
+            logger.error(f"Erreur lors de l'OCR et du clustering : {e}")
+            raise
+
+        # Étape 3 : Convertir les lignes en texte brut
+        try:
+            # lignes est une liste de listes. Il faut les aplatir et les joindre.
+            text = "\n".join([" ".join(ligne) for ligne in lignes])
+            logger.info("Conversion des lignes en texte brut terminée.")
+            logger.debug(f"Texte brut extrait : {text[:200]}...")  # Limiter l'affichage à 200 caractères
+        except Exception as e:
+            logger.error(f"Erreur lors de la conversion des lignes en texte brut : {e}")
+            raise
+
+        # Étape 4 : Convertir le texte en JSON structuré
+        logger.info("Début de la conversion du texte en JSON structuré.")
+        response_json = get_structured_json_from_text(text)
+        logger.info("Conversion du texte en JSON structuré réussie.")
+
+        return response_json
+
+    except Exception as e:
+        logger.error("Une erreur s'est produite lors de l'analyse du ticket : %s", e)
+        raise  # Propager l'exception pour un traitement éventuel en amont
+
+    finally:
+        logger.info("Fin de l'analyse du ticket.")

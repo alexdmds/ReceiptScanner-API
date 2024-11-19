@@ -8,7 +8,7 @@ sys.path.append(project_root)
 
 #Ce fichier va contenir la fonction principale appelée dans le main qui prend en entrée une image et qui retourne un json structuré
 #Il appelle d'autres utilitaires pour réaliser les fonctions unitaires
-from API.OpenAICall import get_structured_json_from_text
+from src.API.OpenAICall import get_structured_json_from_text
 from src.crop_ticket.apply_crop_ticket import crop_highest_confidence_box
 from src.oriente_text.oriente_text import straighten_using_ocr
 from src.oriente_text.colorimetrie_ocr import preprocess_image_for_ocr

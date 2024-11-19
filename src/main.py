@@ -1,6 +1,15 @@
+import sys
+import os
+
+# Ajouter dynamiquement le dossier parent à sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, "../"))  # Chemin vers le dossier parent contenant src
+sys.path.append(project_root)
+
+
 from flask import Flask, request, jsonify
 import requests
-from process_ticket.analyse_ticket import analyse_ticket
+from src.process_ticket.analyse_ticket import analyse_ticket
 
 app = Flask(__name__)
 

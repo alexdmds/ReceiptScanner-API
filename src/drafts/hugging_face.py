@@ -1,6 +1,5 @@
 from transformers import DonutProcessor, AutoModelForImageTextToText
 from PIL import Image
-import torch
 
 # Charger le processor et le modèle
 processor = DonutProcessor.from_pretrained("mychen76/invoice-and-receipts_donut_v1")

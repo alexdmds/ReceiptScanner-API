@@ -26,4 +26,4 @@
         
             - name: Deploy to App Engine
               run: |
-                gcloud app deploy --no-promote --quiet  # Déploiement effectif avec routage du trafic
+                gcloud app deploy --no-promote --quiet --timeout=1200s

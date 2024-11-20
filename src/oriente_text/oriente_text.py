@@ -1,6 +1,6 @@
 from google.cloud import vision
 import numpy as np
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image
 import io
 from PIL.ExifTags import TAGS as ExifTags
 from sklearn.cluster import DBSCAN

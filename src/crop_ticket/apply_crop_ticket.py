@@ -7,7 +7,6 @@ project_root = os.path.abspath(os.path.join(current_dir, "../../"))  # Chemin ve
 sys.path.append(project_root)
 
 import torch
-from PIL import Image
 import torchvision.transforms as T
 import torchvision
 from src.crop_ticket.download_model import download_model_from_gcs

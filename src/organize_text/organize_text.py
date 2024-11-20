@@ -15,8 +15,6 @@ from PIL import Image
 from src.crop_ticket.apply_crop_ticket import crop_highest_confidence_box
 from src.oriente_text.oriente_text import straighten_using_ocr
 from src.oriente_text.colorimetrie_ocr import preprocess_image_for_ocr
-from PIL import ImageDraw
-import cv2
 
 
 def ocr_ticket_with_clustering_and_columns(image):

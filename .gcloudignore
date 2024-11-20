@@ -17,3 +17,16 @@
 __pycache__/
 # Ignored by the build system
 /setup.cfg
+
+# Exclude virtual environments and dependency directories
+venv/
+.venv/
+
+# Exclude system files
+.DS_Store
+*.log
+__pycache__/
+
+# Exclude local configurations
+*.local
+*.tmp

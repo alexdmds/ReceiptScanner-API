@@ -26,4 +26,4 @@
         
             - name: Deploy to App Engine
               run: |
-                gcloud app deploy --no-promote --quiet --timeout=1200s
+                gcloud app deploy --no-promote --quiet --verbosity=debug

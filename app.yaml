@@ -1,7 +1,16 @@
 runtime: python311
 
-entrypoint: gunicorn -b :$PORT src.main:app
+entrypoint: gunicorn -b :$PORT src.main:app --timeout 120
 
 handlers:
 - url: /.*
   script: auto
+
+instance_class: F4  # Classe avec plus de ressources (facultatif)
+automatic_scaling:
+  target_cpu_utilization: 0.65
+  target_throughput_utilization: 0.75
+  min_idle_instances: 1
+  max_idle_instances: 2
+  min_pending_latency: 120s
+  max_pending_latency: 120s

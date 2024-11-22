@@ -9,7 +9,6 @@ sys.path.append(project_root)
 import torch
 import torchvision.transforms as T
 import torchvision
-from src.crop_ticket.download_model import download_model_from_gcs
 
 def crop_highest_confidence_box(image):
     """
@@ -24,13 +23,6 @@ def crop_highest_confidence_box(image):
     Returns:
         PIL.Image.Image ou None: La zone recadrée au format d'origine ou None si aucune boîte valide.
     """
-    # Spécifiez les informations de stockage
-    bucket_name = "kadi_model_ticket"
-    source_blob_name = "model_v1.pth"
-    destination_file_name = "src/crop_ticket/model_v1.pth"
-
-    # Télécharger le modèle si nécessaire
-    model_path = download_model_from_gcs(bucket_name, source_blob_name, destination_file_name)
 
     # Charger le modèle sauvegardé
     model_checkpoint_path = "src/crop_ticket/model_v1.pth"

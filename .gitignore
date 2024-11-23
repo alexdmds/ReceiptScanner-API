@@ -3,3 +3,9 @@ venv/
 local_images
 local_annotations
 *.pth
+.pytest_cache/
+
+# Exclure les fichiers de cache Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo

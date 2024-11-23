@@ -7,3 +7,6 @@ instance_class: F4
 handlers:
 - url: /.*
   script: auto
+
+env_variables:
+  ENV: "prod"

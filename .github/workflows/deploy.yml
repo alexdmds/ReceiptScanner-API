@@ -20,7 +20,7 @@
 
             - name: Restore model file
               run: |
-                curl -o src/crop_ticket/model_v1.pth "https://storage.googleapis.com/kadi_model_ticket/model_v1.pth"
+                curl -o src/crop_ticket/model_complet.pth "https://storage.googleapis.com/kadi_model_ticket/model_complet.pth"
         
             - name: Set up Cloud SDK
               uses: google-github-actions/setup-gcloud@v1

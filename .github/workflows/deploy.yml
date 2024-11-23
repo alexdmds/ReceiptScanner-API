@@ -18,13 +18,20 @@
               with:
                 credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-            - name: Restore model file
+            - name: Download model with gsutil
               run: |
-                curl -o src/crop_ticket/model_complet.pth "https://storage.googleapis.com/kadi_model_ticket/model_complet.pth"
+                gsutil cp gs://kadi_model_ticket/model_complet.pth src/crop_ticket/model_complet.pth
 
             - name: Verify model file
               run: |
                 test -f src/crop_ticket/model_complet.pth || { echo "Model file is missing!"; exit 1; }
+
+            - name: Check model file size
+              run: |
+                if [[ $(stat --printf="%s" src/crop_ticket/model_complet.pth) -lt 100000 ]]; then
+                  echo "Model file seems too small! Check the source or permissions.";
+                  exit 1;
+                fi
         
             - name: Set up Cloud SDK
               uses: google-github-actions/setup-gcloud@v1

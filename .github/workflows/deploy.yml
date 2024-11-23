@@ -33,8 +33,6 @@
                 gcloud app deploy \
                   --no-promote \
                   --quiet \
-                  --verbosity=debug \
-                  --timeout=1800s \
                   --project=c-troop-70f68
               env:
                 CLOUDSDK_COMPUTE_MACHINE_TYPE: "n1-highcpu-4" # Machine plus puissante

@@ -32,3 +32,8 @@ __pycache__/
 *.tmp
 
 *.jpg
+
+.pytest_cache/
+.vscode/
+tests/
+pytest.ini

@@ -90,7 +90,7 @@ def ocr_ticket_with_clustering_and_columns(image):
     avg_height = np.mean(heights)
 
     # Ajuster dynamiquement `eps`
-    eps = avg_height * 0.4  # 40% de la hauteur moyenne
+    eps = avg_height * 0.1  # 10% de la hauteur moyenne
     print(f"eps={eps}")
     dbscan = DBSCAN(eps=eps, min_samples=1)
     dbscan.fit(y_coords)

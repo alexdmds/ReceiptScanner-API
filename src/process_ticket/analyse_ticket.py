@@ -118,3 +118,13 @@ def analyse_ticket(image_content):
 
     finally:
         logger.info("Fin de l'analyse du ticket.")
+
+if __name__ == "__main__":
+    try:
+        image_path = "tests/static/p0BRZDxUjvJVIfS7RNjz_photo.jpg"  # Remplace par le chemin vers ton image
+        with open(image_path, "rb") as f:
+            image_content = f.read()
+        ticket_info = analyse_ticket(image_content)
+        print(ticket_info)
+    except Exception as e:
+        print(f"Erreur : {e}")

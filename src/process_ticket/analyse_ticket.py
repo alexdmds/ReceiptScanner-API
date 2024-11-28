@@ -13,10 +13,12 @@ from src.crop_ticket.apply_crop_ticket import crop_highest_confidence_box
 from src.oriente_text.oriente_text import straighten_using_ocr
 from src.oriente_text.colorimetrie_ocr import preprocess_image_for_ocr
 from src.organize_text.organize_text import ocr_ticket_with_clustering_and_columns
+from src.utils.normalize_json import normalize_json
 
 import logging
 from PIL import Image
 import io
+import json
 
 def configure_logging():
     # Récupérer l'environnement (local ou production) depuis une variable d'environnement
@@ -110,6 +112,16 @@ def analyse_ticket(image_content):
         response_json = get_structured_json_from_text(text)
         logger.info("Conversion du texte en JSON structuré réussie.")
 
+        # Étape 5 : Parser si nécessaire et normaliser
+        logger.info("Début de la normalisation du JSON.")
+        if isinstance(response_json, str):
+            response_json = json.loads(response_json)  # Convertir la chaîne en dictionnaire
+
+        response_json = normalize_json(response_json)
+        logger.info("Normalisation réussie.")
+
+        return response_json
+
         return response_json
 
     except Exception as e:
@@ -121,7 +133,7 @@ def analyse_ticket(image_content):
 
 if __name__ == "__main__":
     try:
-        image_path = "tests/static/p0BRZDxUjvJVIfS7RNjz_photo.jpg"  # Remplace par le chemin vers ton image
+        image_path = "tests/static/images/ticket8.jpg"  # Remplace par le chemin vers ton image
         with open(image_path, "rb") as f:
             image_content = f.read()
         ticket_info = analyse_ticket(image_content)

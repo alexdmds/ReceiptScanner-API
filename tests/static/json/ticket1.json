@@ -1,0 +1,26 @@
+{
+    "estTicket": 1,
+    "nom_magasin": "DIAGONAL",
+    "adresse": "84 RUE DE CHARONNE",
+    "telephone": "01 43 48 85 96",
+    "date_achat": "14/10/2024",
+    "heure_achat": "13:10",
+    "prix_total": 4.24,
+    "produits_achetes": [
+      {
+        "produit": "FINES BULLES PER",
+        "quantite": 1,
+        "prix_unitaire": 1
+      },
+      {
+        "produit": "J.POUSS.EPIN.SS",
+        "quantite": 1,
+        "prix_unitaire": 1.99
+      },
+      {
+        "produit": "CR.FRAICHE 190G",
+        "quantite": 1,
+        "prix_unitaire": 1.25
+      }
+    ]
+  }

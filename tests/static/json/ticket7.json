@@ -1,0 +1,41 @@
+{
+    "estTicket": 1,
+    "nom_magasin": "FRANPRIX",
+    "adresse": "23 BLD DE GRENELLE",
+    "telephone": "01 45 79 19 34",
+    "date_achat": "08/02/2024",
+    "heure_achat": "11:28",
+    "prix_total": 18.6,
+    "produits_achetes": [
+      {
+        "produit": "LASAGNES BOLOG",
+        "quantite": 1,
+        "prix_unitaire": 5.65
+      },
+      {
+        "produit": "PTI.SACR.CHOC",
+        "quantite": 1,
+        "prix_unitaire": 2.05
+      },
+      {
+        "produit": "CROQUE JAMB.PA",
+        "quantite": 4,
+        "prix_unitaire": 3.9
+      },
+      {
+        "produit": "NESCAFE FARM.C",
+        "quantite": 1,
+        "prix_unitaire": 3.95
+      },
+      {
+        "produit": "DEMI BAGUETTE",
+        "quantite": 1,
+        "prix_unitaire": 0.55
+      },
+      {
+        "produit": "COCA PET 1L75",
+        "quantite": 1,
+        "prix_unitaire": 2.5
+      }
+    ]
+  }

@@ -1,0 +1,41 @@
+{
+    "estTicket": 1,
+    "nom_magasin": "FRANPRIX",
+    "adresse": "23 BLD DE GRENELLE",
+    "telephone": "01 45 79 19 34",
+    "date_achat": "10/09/2024",
+    "heure_achat": "11:04",
+    "prix_total": 16.88,
+    "produits_achetes": [
+      {
+        "produit": "DEMI MICHE",
+        "quantite": 1,
+        "prix_unitaire": 3.29
+      },
+      {
+        "produit": "CROISSANT BIO",
+        "quantite": 1,
+        "prix_unitaire": 0.85
+      },
+      {
+        "produit": "CROISSANT BIO",
+        "quantite": 1,
+        "prix_unitaire": 0.85
+      },
+      {
+        "produit": "MAD.LONG.CACAO",
+        "quantite": 1,
+        "prix_unitaire": 2.55
+      },
+      {
+        "produit": "COMTE AOP 250G",
+        "quantite": 1,
+        "prix_unitaire": 4.35
+      },
+      {
+        "produit": "CHIPOLATAS X6",
+        "quantite": 1,
+        "prix_unitaire": 4.99
+      }
+    ]
+  }

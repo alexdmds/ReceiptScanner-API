@@ -1,0 +1,26 @@
+{
+    "estTicket": 1,
+    "nom_magasin": "franprix",
+    "adresse": "23 BLD DE GRENELLE",
+    "telephone": "01 45 79 19 34",
+    "date_achat": "04/11/2024",
+    "heure_achat": "21:14",
+    "prix_total": 6.59,
+    "produits_achetes": [
+      {
+        "produit": "BAGUETTE RUSTI",
+        "quantite": 1,
+        "prix_unitaire": 0.95
+      },
+      {
+        "produit": "GRANA PADANO R T1 11",
+        "quantite": 1,
+        "prix_unitaire": 2.65
+      },
+      {
+        "produit": "BARILLA SAUCE PE",
+        "quantite": 1,
+        "prix_unitaire": 2.99
+      }
+    ]
+  }

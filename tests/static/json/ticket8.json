@@ -1,0 +1,36 @@
+{
+    "estTicket": 1,
+    "nom_magasin": "FRANPRIX",
+    "adresse": "23 BLD DE GRENELLE",
+    "telephone": "01 45 79 19 34",
+    "date_achat": "06/02/2024",
+    "heure_achat": "09:16",
+    "prix_total": 20.38,
+    "produits_achetes": [
+      {
+        "produit": "VIENNOIS.A.GAS",
+        "quantite": 1,
+        "prix_unitaire": 1.5
+      },
+      {
+        "produit": "LESS.24D.ECO 4",
+        "quantite": 1,
+        "prix_unitaire": 8.59
+      },
+      {
+        "produit": "LAITUE 200G MF",
+        "quantite": 1,
+        "prix_unitaire": 1.89
+      },
+      {
+        "produit": "FINDUS POMMES",
+        "quantite": 1,
+        "prix_unitaire": 3.85
+      },
+      {
+        "produit": "CHIPOLATAS X6",
+        "quantite": 1,
+        "prix_unitaire": 4.55
+      }
+    ]
+  }

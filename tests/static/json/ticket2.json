@@ -1,0 +1,21 @@
+{
+    "estTicket": 1,
+    "nom_magasin": "MONOPRIX",
+    "adresse": "2 RUE DU COMMERCE 75015 PARTS",
+    "telephone": "01 45 79 94 86",
+    "date_achat": "11/11/24",
+    "heure_achat": "16:03",
+    "prix_total": 11.49,
+    "produits_achetes": [
+      {
+        "produit": "T FONDUE 4 FROMAGES",
+        "quantite": 1,
+        "prix_unitaire": 9.49
+      },
+      {
+        "produit": "2 X BAGUETTE F.LAL.M.G",
+        "quantite": 2,
+        "prix_unitaire": 1.0
+      }
+    ]
+  }

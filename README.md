@@ -1,32 +1,36 @@
-# C-Troop App GAE
+# ReceiptScanner-API
 
 ## Description
-Application web moderne développée avec Flask et déployée sur Google App Engine. Cette application utilise des technologies de pointe pour le traitement d'images et l'intelligence artificielle.
+API moderne développée avec Flask et déployée sur Google App Engine, spécialisée dans l'analyse et la structuration de tickets de caisse. L'application utilise l'intelligence artificielle et la vision par ordinateur pour extraire automatiquement les informations des tickets et les restituer dans un format JSON structuré.
 
 ## Technologies Principales
 - **Backend**: Python 3.11, Flask
 - **Déploiement**: Google App Engine
 - **Traitement d'Images**: OpenCV, Pillow
-- **Intelligence Artificielle**: PyTorch, scikit-learn
+- **OCR et IA**: Google Cloud Vision, PyTorch
+- **Format de Sortie**: JSON structuré
 - **Serveur WSGI**: Gunicorn
 
 ## Fonctionnalités
-- Traitement d'images avancé
-- Intégration avec Google Cloud Vision
-- API RESTful
-- Interface utilisateur moderne
+- Scan et analyse automatique de tickets de caisse
+- Extraction intelligente des informations (montants, articles, dates, etc.)
+- Restitution des données en JSON structuré
+- API RESTful pour une intégration facile
+- Traitement d'images haute performance
+- Intégration avec Google Cloud Vision pour une reconnaissance précise
 
 ## Prérequis
 - Python 3.11
 - pip (gestionnaire de paquets Python)
 - Compte Google Cloud Platform
+- Accès à l'API Google Cloud Vision
 
 ## Installation
 
 1. Cloner le repository :
 ```bash
 git clone [URL_DU_REPO]
-cd c_troop_app_gae
+cd ReceiptScanner-API
 ```
 
 2. Créer un environnement virtuel :
@@ -44,7 +48,8 @@ pip install -r requirements.txt
 
 ## Configuration
 1. Configurer les variables d'environnement nécessaires
-2. Assurez-vous d'avoir les credentials Google Cloud appropriés
+2. Configurer les credentials Google Cloud Vision
+3. Ajuster les paramètres de traitement d'images selon vos besoins
 
 ## Déploiement
 L'application est configurée pour être déployée sur Google App Engine. Utilisez la commande suivante pour déployer :
@@ -60,13 +65,23 @@ pytest
 
 ## Structure du Projet
 ```
-c_troop_app_gae/
+ReceiptScanner-API/
 ├── src/               # Code source principal
+│   ├── vision/       # Traitement d'images et OCR
+│   ├── api/          # Endpoints de l'API
+│   └── utils/        # Utilitaires
 ├── tests/            # Tests unitaires et d'intégration
 ├── requirements.txt  # Dépendances du projet
 ├── app.yaml         # Configuration Google App Engine
 └── ...
 ```
+
+## Format de Sortie JSON
+L'API renvoie les données extraites dans un format JSON structuré contenant :
+- Informations du ticket (date, heure, magasin)
+- Liste des articles avec prix
+- Montants (sous-total, TVA, total)
+- Métadonnées additionnelles
 
 ## Contribution
 Les contributions sont les bienvenues ! N'hésitez pas à :
